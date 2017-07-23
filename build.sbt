@@ -1,12 +1,12 @@
 version in ThisBuild := "0.1"
 
-scalaVersion in ThisBuild := "2.11.7"
+scalaVersion in ThisBuild := "2.11.8"
 
 lazy val main = Project("ShapelessExercises", file("."))
   .settings(
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "2.3.0",
-      "org.scala-lang" % "scala-reflect" % "2.11.7",
+      "org.scala-lang" % "scala-reflect" % "2.11.8",
       "io.spray" %%  "spray-json" % "1.3.2",
       "org.specs2" %% "specs2-core" % "3.7" % "test"
     ),
