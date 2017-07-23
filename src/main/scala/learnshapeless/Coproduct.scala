@@ -46,11 +46,11 @@ object Ch03_Coproducts extends App {
   def eg_invalidClue = Coproduct[Clue](born(2020))
 
   /** create a clue about the identify of a famous scientist, being the name of `eg_florey` */
-  def ex_nameClue = ???
+  def ex_nameClue = Coproduct[Clue](name("Florey"))
   println(s"ex_nameClue $ex_nameClue")
 
   /** create a clue about the identify of a famous scientist, being the birth year `1879` */
-  def ex_bornClue = ???
+  def ex_bornClue = Coproduct[Clue](born(1879))
   println(s"ex_bornClue $ex_bornClue")
 
   def eg_allClues: Vector[Clue] = Vector(eg_clueCountry, eg_invalidClue, ex_nameClue, ex_bornClue)
@@ -59,11 +59,11 @@ object Ch03_Coproducts extends App {
   def eg_select: Option[Country] = eg_clueCountry.select[Country]
 
   /* select the name of `eg_clueCountry` */
-  def ex_selectName: Option[Name] = ???
+  def ex_selectName: Option[Name] = eg_clueCountry.select[Name]
   println(s"ex_selectName $ex_selectName")
 
   /* drop two elements of  `eg_clueCountry` */
-  def ex_drop2: Option[Country :+: CNil] = ???
+  def ex_drop2: Option[Country :+: CNil] = eg_clueCountry.drop(2)
   println(s"ex_drop2 $ex_drop2")
 
 
@@ -76,18 +76,24 @@ object Ch03_Coproducts extends App {
   }
 
   /* Use `eg_isValidClue` to filter down to just invalid clues in `eg_allClues` */
-  def eg_invalidClues = eg_allClues.map(_.map(eg_isValidClue))
+  def eg_invalidClues = eg_allClues.map(_.map(eg_isValidClue).unify)
+  println(s"eg_invalidClues $eg_invalidClues")
 
   /* Write your own Poly1 that determines if aa clue is "good", based on example `eg_isValidClue`.
 
   "Good" clues uniquely identify a scientist, whereas non-good clues are ambiguous. For example,
   the Name "Florey" is good, whereas Country `Germany` is not, since multiple scientists share that country.
   */
-  def ex_isGoodClue = ???
+  object isGoodClue extends Poly1 {
+    implicit def name = at[Name](n => eg_all_scientists.count(_.select[Name] == n) == 1)
+    implicit def born = at[Born](b => eg_all_scientists.count(_.select[Born] == b) == 1)
+    implicit def country = at[Country](c => eg_all_scientists.count(_.select[Country] == c) == 1)
+  }
+  def ex_isGoodClue = isGoodClue
   println(s"ex_isGoodClue $ex_isGoodClue")
 
   /* Use ex_isGoodClue to filter down `eg_allClues` to just the "good" ones */
-  def ex_goodClues = ???
+  def ex_goodClues = eg_allClues.map(_.map(ex_isGoodClue).unify)
   println(s"ex_goodClues $ex_goodClues")
 
 }
